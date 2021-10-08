@@ -64,7 +64,9 @@ WSGI_APPLICATION = "sensive_blog.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": env.str("DATABASE_FILEPATH", os.path.join(BASE_DIR, "db.sqlite3")),
+        "NAME": env.str(
+            "DATABASE_FILEPATH", os.path.join(BASE_DIR, "db.sqlite3")
+        ),
     }
 }
 
@@ -81,6 +83,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa: E501
     },
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
 ]
 
 LANGUAGE_CODE = "en-us"
