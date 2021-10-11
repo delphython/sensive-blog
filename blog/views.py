@@ -105,9 +105,11 @@ def post_detail(request, slug):
         tags_count=Count("posts")
     ).order_by("-tags_count")[5:]
 
-    most_popular_posts = Post.objects.annotate(
-        likes_count=Count("likes")
-    ).order_by("-likes_count")[:5]
+    most_popular_posts = (
+        Post.objects.prefetch_related("author")
+        .annotate(likes_count=Count("likes"))
+        .order_by("-likes_count")[:5]
+    )
 
     context = {
         "post": serialized_post,
@@ -126,9 +128,11 @@ def tag_filter(request, tag_title):
         tags_count=Count("posts")
     ).order_by("-tags_count")[5:]
 
-    most_popular_posts = Post.objects.annotate(
-        likes_count=Count("likes")
-    ).order_by("-likes_count")[:5]
+    most_popular_posts = (
+        Post.objects.prefetch_related("author")
+        .annotate(likes_count=Count("likes"))
+        .order_by("-likes_count")[:5]
+    )
 
     related_posts = tag.posts.all().prefetch_related("posts")[:20]
 
