@@ -47,9 +47,11 @@ def get_likes_count(post):
 
 
 def index(request):
-    most_popular_posts = Post.objects.annotate(
-        likes_count=Count("likes")
-    ).order_by("-likes_count")[:5]
+    most_popular_posts = (
+        Post.objects.prefetch_related("author")
+        .annotate(likes_count=Count("likes"))
+        .order_by("-likes_count")[:5]
+    )
 
     fresh_posts = Post.objects.order_by("published_at")
     most_fresh_posts = list(fresh_posts)[-5:]
@@ -60,9 +62,11 @@ def index(request):
 
     context = {
         "most_popular_posts": [
-            serialize_post(post) for post in most_popular_posts
+            serialize_post_optimized(post) for post in most_popular_posts
         ],
-        "page_posts": [serialize_post(post) for post in most_fresh_posts],
+        "page_posts": [
+            serialize_post_optimized(post) for post in most_fresh_posts
+        ],
         "popular_tags": [serialize_tag(tag) for tag in most_popular_tags],
     }
     return render(request, "index.html", context)
