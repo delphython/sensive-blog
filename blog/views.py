@@ -52,12 +52,14 @@ def index(request):
         .annotate(likes_count=Count("likes", distinct=True))
         .order_by("-likes_count")[:5]
     )
+
     most_popular_posts_ids = [post.id for post in most_popular_posts]
     posts_with_comments = Post.objects.filter(
         id__in=most_popular_posts_ids
     ).annotate(comments_amount=Count("post_comment"))
     ids_and_comments = posts_with_comments.values_list("id", "comments_amount")
     count_for_id = dict(ids_and_comments)
+
     for post in most_popular_posts:
         post.comments_amount = count_for_id[post.id]
 
