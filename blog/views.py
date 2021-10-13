@@ -42,10 +42,6 @@ def serialize_tag(tag):
     }
 
 
-def get_likes_count(post):
-    return post.likes_count
-
-
 def index(request):
     most_popular_posts = (
         Post.objects.prefetch_related("author")
