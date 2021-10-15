@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.shortcuts import render
 from blog.models import Comment, Post, Tag
 
@@ -46,20 +46,21 @@ def serialize_tag(tag):
 
 
 def index(request):
+    prefetch = Prefetch(
+        "tags", queryset=Tag.objects.annotate(post_amount=Count("posts"))
+    )
     most_popular_posts = (
         Post.objects.prefetch_related("author")
-        .prefetch_related("tags")
+        .prefetch_related(prefetch)
         .popular()[:5]
         .fetch_with_comments_count()
     )
 
     fresh_posts = (
         Post.objects.prefetch_related("author")
-        .prefetch_related("tags")
-        .annotate(
-            comments_amount=Count("post_comment"),
-        )
+        .prefetch_related(prefetch)
         .order_by("published_at")
+        .fetch_with_comments_count()
     )
     most_fresh_posts = list(fresh_posts)[-5:]
 
