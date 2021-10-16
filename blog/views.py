@@ -75,7 +75,7 @@ def index(request):
 
 def post_detail(request, slug):
     post = Post.objects.get(slug=slug)
-    comments = Comment.objects.filter(post=post)
+    comments = Comment.objects.filter(post=post).prefetch_related("author")
     serialized_comments = []
     for comment in comments:
         serialized_comments.append(
@@ -137,9 +137,11 @@ def tag_filter(request, tag_title):
         .fetch_with_comments_count()
     )
 
-    related_posts = tag.posts.annotate(
-        comments_amount=Count("post_comment"),
-    ).all()[:20]
+    related_posts = (
+        tag.posts.prefetch_tags_with_posts_count()
+        .prefetch_related("author")[:20]
+        .fetch_with_comments_count()
+    )
 
     context = {
         "tag": tag.title,
