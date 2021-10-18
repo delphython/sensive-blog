@@ -57,7 +57,7 @@ def index(request):
 
 def post_detail(request, slug):
     try:
-        post = Post.objects.get(slug=slug).prefetch_related("author")
+        post = Post.objects.prefetch_related("author").get(slug=slug)
     except Post.DoesNotExist:
         raise Http404("Post does not exist")
 
