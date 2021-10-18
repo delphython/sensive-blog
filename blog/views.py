@@ -1,4 +1,6 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count
+from django.http import Http404
 from django.shortcuts import render
 from blog.models import Comment, Post, Tag
 
@@ -54,7 +56,11 @@ def index(request):
 
 
 def post_detail(request, slug):
-    post = Post.objects.get(slug=slug)
+    try:
+        post = Post.objects.get(slug=slug)
+    except Post.DoesNotExist:
+        raise Http404("Post does not exist")
+
     comments = Comment.objects.filter(post=post).prefetch_related("author")
     serialized_comments = []
     for comment in comments:
